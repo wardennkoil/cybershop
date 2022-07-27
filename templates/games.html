@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}All Games{% endblock %}
+{% block body %}
+<div class="container mt-5">
+    <h1>Все игры на сайте</h1>
+    {% for element in list_of_games %}
+        <div class="alert alert-info">
+            <h2>{{ element.name }}</h2>
+            <p>{{ element.cost }}</p>
+            <a type="button" class="button" href="/games/{{ element.id }}">More information</a>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
