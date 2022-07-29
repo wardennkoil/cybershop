@@ -20,4 +20,4 @@ class Game(db.Model):
     def __repr__(self):
         return '<Game %r>' % self.id
 
-db.create_all()
+#db.create_all()

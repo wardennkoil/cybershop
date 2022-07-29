@@ -40,10 +40,12 @@ def add_game():
 
         min_requirements = json.dumps(min_requirements)
         sug_requirements = json.dumps(sug_requirements)
+        print("Min parameters: " + min_requirements)
+        print(type(min_requirements))
         game = Game(name=name, cost=cost, game_description=game_description, url=url,
                     platform=platform, developers=developers, genre=genre, min_requirements=min_requirements,
                     sug_requirements=sug_requirements)
-        print(game)
+        print(game.id)
         print(request.values)
         try:
             db.session.add(game)
