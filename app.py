@@ -1,20 +1,10 @@
-from flask import Flask, render_template, request, redirect
+import json
+
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+from config import app
+from database import Game, db
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///databases/cyber.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
-
-
-class Game(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(150), nullable=False)
-    text = db.Column(db.Text, nullable=False)
-    cost = db.Column(db.Integer, nullable=False)
-
-    def __repr__(self):
-        return '<Game %r>' % self.id
 
 
 @app.route('/')
@@ -28,15 +18,41 @@ def add_game():
     if request.method == "POST":
         name = request.form['name']
         cost = request.form['cost']
-        text = request.form['text']
-        game = Game(name=name, cost=cost, text=text)
+        game_description = request.form['text']
+        url = request.form['url']
+        platform = request.form['platform']
+        developers = request.form['developers']
+        genre = request.form['genre']
+        min_requirements = {'os': request.form['os_min'],
+                            'processor': request.form['processor_min'],
+                            'ram': request.form['ram_min'],
+                            'graphics': request.form['graphics_min'],
+                            'directx': request.form['directx_min'],
+                            'network': request.form['network_min'],
+                            'storage': request.form['storage_min']}
+        sug_requirements = {'os': request.form['os_sug'],
+                            'processor': request.form['processor_sug'],
+                            'ram': request.form['ram_sug'],
+                            'graphics': request.form['graphics_sug'],
+                            'directx': request.form['directx_sug'],
+                            'network': request.form['network_sug'],
+                            'storage': request.form['storage_sug']}
+
+        min_requirements = json.dumps(min_requirements)
+        sug_requirements = json.dumps(sug_requirements)
+        game = Game(name=name, cost=cost, game_description=game_description, url=url,
+                    platform=platform, developers=developers, genre=genre, min_requirements=min_requirements,
+                    sug_requirements=sug_requirements)
+        print(game)
+        print(request.values)
         try:
             db.session.add(game)
             db.session.commit()
             print('saved')
             return redirect('/index')
-        except:
+        except Exception as e:
             print("There is a mistake!")
+            print(e)
     else:
         return render_template("addgame.html")
 
@@ -51,6 +67,11 @@ def games_page():
 def full_page(id):
     game = Game.query.get(id)
     return render_template('game_page.html', game=game)
+
+@app.route('/testgame')
+def test():
+    games = Game.query.get()
+    return render_template('game_page.html')
 
 
 if __name__ == "__main__":
